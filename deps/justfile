@@ -2,25 +2,25 @@ default:
     @just --list
 
 clean:
-    -test -e out && rm -r out
-    mkdir out
+    -test -e .out && rm -r .out
+    mkdir .out
 
 build: clean build-grub build-linux
 
 GRUB_VERSION := "2.06"
 
 build-grub:
-    curl https://ftp.gnu.org/gnu/grub/grub-{{GRUB_VERSION}}.tar.xz -o out/grub.tar.xz
-    cd out && tar xf grub.tar.xz
-    cd out/grub-{{GRUB_VERSION}} && ./configure --target=x86_64 --with-platform=efi --disable-werror && make
+    curl https://ftp.gnu.org/gnu/grub/grub-{{GRUB_VERSION}}.tar.xz -o .out/grub.tar.xz
+    cd .out && tar xf grub.tar.xz
+    cd .out/grub-{{GRUB_VERSION}} && ./configure --target=x86_64 --with-platform=efi --disable-werror && make
 
-    mv out/grub-{{GRUB_VERSION}} out/grub
+    mv .out/grub-{{GRUB_VERSION}} .out/grub
 
 LINUX_VERSION := "linux-6.7.2"
 
 build-linux:
-    curl https://cdn.kernel.org/pub/linux/kernel/v6.x/{{LINUX_VERSION}}.tar.xz -o out/linux.tar.xz
-    cd out && tar xf linux.tar.xz
-    cd out/{{LINUX_VERSION}} && make defconfig && make all
+    curl https://cdn.kernel.org/pub/linux/kernel/v6.x/{{LINUX_VERSION}}.tar.xz -o o.ut/linux.tar.xz
+    cd .out && tar xf linux.tar.xz
+    cd .out/{{LINUX_VERSION}} && make defconfig && make all
 
-    cp out/{{LINUX_VERSION}}/arch/x86/boot/bzImage out/linux.x86
+    cp .out/{{LINUX_VERSION}}/arch/x86/boot/bzImage .out/linux.x86

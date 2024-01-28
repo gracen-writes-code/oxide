@@ -1,0 +1,17 @@
+default:
+    @just --list
+
+clean:
+    cargo clean --target-dir .target
+
+    -test -e .out && rm -r .out
+    mkdir .out
+
+build: clean
+    mkdir .out/bin
+    mkdir .out/sbin
+
+    cargo build -r --target-dir .target
+
+    awk '{system("cp .target/release/" $1 " .out/bin")}'   modules_bin.txt
+    awk '{system("cp .target/release/" $1 " .out/sbin")}'  modules_sbin.txt
