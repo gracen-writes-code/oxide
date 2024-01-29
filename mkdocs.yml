@@ -1,0 +1,5 @@
+site_name: Oxide Linux Specification
+theme:
+  name: readthedocs
+  hljs_languages:
+    - rust

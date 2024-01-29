@@ -5,6 +5,8 @@ fn main() -> ! {
         panic!("quartz can only be run as the init process!")
     }
 
+    println!("Welcome to Oxide Linux!");
+
     let mut handle = Command::new("/bin/sh")
         .spawn()
         .expect("Shell failed to start! Prepare for kernel panic...");
@@ -14,6 +16,5 @@ fn main() -> ! {
         .expect("Failed to exit shell properly! Prepare for kernel panic...");
 
     println!("Shell exited. Looping forever now...");
-
     loop {}
 }
