@@ -1,7 +1,12 @@
 site_name: Oxide Linux Specification
+docs_dir: spec
+
 theme:
   name: readthedocs
   hljs_languages:
     - rust
 
-docs_dir: spec
+nav:
+  - Home: "index.md"
+  - About:
+    - License: "license.md"
