@@ -7,6 +7,8 @@ theme:
     - rust
 
 nav:
-  - Home: "index.md"
+  - Home: index.md
+  - Filesystem Standard:
+      - Overview: fs/overview.md
   - About:
-      - License: "license.md"
+      - License: license.md
