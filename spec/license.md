@@ -2,7 +2,7 @@
 
 Oxide Linux is licensed under the MIT License.
 
-```
+```plaintext
 MIT License
 
 Copyright (c) 2024 Gracen C.

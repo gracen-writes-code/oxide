@@ -1,4 +1,4 @@
-site_name: Oxide Linux Specification
+site_name: Oxide Linux
 docs_dir: spec
 
 theme:
@@ -9,4 +9,4 @@ theme:
 nav:
   - Home: "index.md"
   - About:
-    - License: "license.md"
+      - License: "license.md"
