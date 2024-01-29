@@ -1,0 +1,3 @@
+# Compatibility
+
+Oxide Linux, being a passion project, is not focused on compatibility with other systems. In fact, many of Oxide's design choices consciously deviate from the normal Linux standard (e.g. filesystem layout) for one simple reason: Oxide is its own thing. Its design puts the joy of creating software first and compatibility with the rest of the Linux world second. As a result, most software designed to be compatible with the average Linux system will not function on Oxide.

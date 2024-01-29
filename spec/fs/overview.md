@@ -1,9 +1,5 @@
 # Oxide Filesystem Standard
 
-Oxide's filesystem design adheres to a version of the [Filesystem Hierarchy Standard](https://refspecs.linuxfoundation.org/fhs.shtml)
-modified to better suit Oxide's [design principles](../design.md). Oxide tries its best
-to not deviate too much from the FHS &mdash; standards exist for a reason &mdash; but
-it doesn't treat it as set in stone.
+Oxide's filesystem, similar to many other components of Oxide, does not adhere to common standards (see [Compatibility](/compat.md)). Rather, it tries to create a filesystem that best fits its own design philosophy. Oxide's filesystem tries to make it easy to develop software within Oxide's ecosystem while also making it simple to be a casual user without ever having to peek behind the proverbial curtain.
 
-**NOTICE**: The filesystem spec is currently in early development. 
-Expect incompleteness and frequent changes.
+**NOTICE**: The filesystem spec is currently in early development. Expect incompleteness and frequent changes.

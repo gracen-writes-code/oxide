@@ -1,4 +1,4 @@
-use std::io::{self, Write};
+use std::{env, io::{self, Write}};
 
 enum ControlFlow {
     Wait,
