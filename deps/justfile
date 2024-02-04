@@ -5,6 +5,8 @@ clean:
     -test -e .out && rm -r .out
     mkdir .out
 
+purge: clean
+
 build: clean build-grub build-linux
 
 GRUB_VERSION := "2.06"
@@ -19,8 +21,9 @@ build-grub:
 LINUX_VERSION := "linux-6.7.2"
 
 build-linux:
-    curl https://cdn.kernel.org/pub/linux/kernel/v6.x/{{LINUX_VERSION}}.tar.xz -o o.ut/linux.tar.xz
+    curl https://cdn.kernel.org/pub/linux/kernel/v6.x/{{LINUX_VERSION}}.tar.xz -o .out/linux.tar.xz
     cd .out && tar xf linux.tar.xz
+    cat custom_config | tee -a .out/{{LINUX_VERSION}}/arch/x86/configs/x86_64_defconfig
     cd .out/{{LINUX_VERSION}} && make defconfig && make all
 
     cp .out/{{LINUX_VERSION}}/arch/x86/boot/bzImage .out/linux.x86

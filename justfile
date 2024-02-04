@@ -7,26 +7,32 @@ clean:
     -test -e .out && rm -r .out
     mkdir .out
 
-    -test -e .images && mkdir .images
+purge: clean
+    just deps/purge
+    just modules/purge
 
 build: clean
     @# Make all the dirs
     mkdir  .out/fs
+    mkdir  .out/fs/.cargo
     mkdir  .out/fs/bin
     mkdir  .out/fs/boot
     mkdir  .out/fs/boot/grub
+    mkdir  .out/fs/dev
     mkdir  .out/fs/lib
     mkdir  .out/fs/lib/x86_64-linux-gnu
     mkdir  .out/fs/lib64
     mkdir  .out/fs/sbin
+    mkdir  .out/fs/system
 
     @# Copy the things that GRUB needs
     cp deps/.out/linux.x86  .out/fs/boot/linux.x86
-    cp grub.cfg             .out/fs/boot/grub/grub.cfg
+    cp defaults/grub.cfg    .out/fs/boot/grub/grub.cfg
 
     #@ Copy files that init links to
     cp /lib/x86_64-linux-gnu/libgcc_s.so.1  .out/fs/lib/x86_64-linux-gnu/libgcc_s.so.1
     cp /lib/x86_64-linux-gnu/libc.so.6      .out/fs/lib/x86_64-linux-gnu/libc.so.6
+    cp /lib/x86_64-linux-gnu/libm.so.6      .out/fs/lib/x86_64-linux-gnu/libm.so.6
     cp /lib64/ld-linux-x86-64.so.2          .out/fs/lib64/ld-linux-x86-64.so.2
 
     @# Compile all modules
@@ -36,6 +42,12 @@ build: clean
 
     @# Make link to init
     ln .out/fs/sbin/quartz .out/fs/sbin/init
+
+    @# Copy Cargo config
+    cp defaults/cargo_config.toml  .out/fs/.cargo/config.toml
+
+    @# Copy main services
+    cp defaults/system.rhai  .out/fs/system/main.rhai
 
 create-image name="devel" size="1024": build
     test {{size}} -ge 128
@@ -79,6 +91,7 @@ create-image name="devel" size="1024": build
     mv .out/oxide.img .images/{{name}}.oxide.img
 
 test image="devel":
-    qemu-system-x86_64 -nographic -m 2g -bios /usr/share/ovmf/OVMF.fd -drive format=raw,file=.images/{{image}}.oxide.img
+    qemu-system-x86_64 -m 2g -bios /usr/share/ovmf/OVMF.fd \
+        -drive format=raw,file=.images/{{image}}.oxide.img
 
 test-new name="devel" size="1024": (create-image name size) (test name)
