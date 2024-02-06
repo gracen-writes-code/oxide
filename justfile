@@ -54,8 +54,12 @@ create-docker name="devel": build-fs
     tar -czvf .out/docker/fs.tar.gz .out/fs
     cp Dockerfile .out/docker
 
-    sudo docker build .out/docker
+    sudo docker build .out/docker -t {{name}}-oxide-linux
 
+run-docker name="devel":
+    sudo docker run {{name}}-oxide-linux
+
+run-new-docker name="devel": (create-docker name) (run-docker name)
 
 # Bootable images
 create-bootable name="devel" size="1024": build-fs
