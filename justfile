@@ -49,6 +49,19 @@ build-fs: clean
     @# Copy main services
     cp defaults/system.rhai  .out/fs/system/main.rhai
 
+
+# Docker images
+create-docker name="devel": build-fs
+    -test -e .out/docker && rm -r .out/docker
+    mkdir .out/docker
+
+    tar -czvf .out/docker/fs.tar.gz .out/fs
+    cp Dockerfile .out/docker
+
+    docker build .out/docker
+
+
+# Bootable images
 create-bootable name="devel" size="1024": build-fs
     test {{size}} -ge 128
     dd if=/dev/zero of=.out/oxide.img bs=1MiB count={{size}}
