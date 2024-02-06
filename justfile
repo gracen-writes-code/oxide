@@ -25,10 +25,6 @@ build-fs: clean
     mkdir  .out/fs/sbin
     mkdir  .out/fs/system
 
-    @# Copy the things that GRUB needs
-    cp deps/.out/linux.x86  .out/fs/boot/linux.x86
-    cp defaults/grub.cfg    .out/fs/boot/grub/grub.cfg
-
     #@ Copy files that init links to
     cp /lib/x86_64-linux-gnu/libgcc_s.so.1  .out/fs/lib/x86_64-linux-gnu/libgcc_s.so.1
     cp /lib/x86_64-linux-gnu/libc.so.6      .out/fs/lib/x86_64-linux-gnu/libc.so.6
@@ -63,6 +59,10 @@ create-docker name="devel": build-fs
 
 # Bootable images
 create-bootable name="devel" size="1024": build-fs
+    @# Copy the things that GRUB needs
+    cp deps/.out/linux.x86  .out/fs/boot/linux.x86
+    cp defaults/grub.cfg    .out/fs/boot/grub/grub.cfg
+
     test {{size}} -ge 128
     dd if=/dev/zero of=.out/oxide.img bs=1MiB count={{size}}
 
