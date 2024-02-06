@@ -101,4 +101,4 @@ test-nogui image="devel":
         -drive format=raw,file=.images/{{image}}.oxide.img
 
 test-new name="devel" size="1024": (create-image name size) (test name)
-test-nogui name="devel" size="1024": (create-image name size) (test-nogui name)
+test-new-nogui name="devel" size="1024": (create-image name size) (test-nogui name)
