@@ -7,6 +7,8 @@ clean:
     -test -e .out && rm -r .out
     mkdir .out
 
+    test -e .images || mkdir .images
+
 purge: clean
     just deps/purge
     just modules/purge
@@ -45,25 +47,7 @@ build-fs: clean
     @# Copy main services
     cp defaults/system.rhai  .out/fs/system/main.rhai
 
-
-# Docker images
-create-docker name="devel": build-fs
-    -test -e .out/docker && rm -r .out/docker
-    mkdir .out/docker
-
-    cd .out/fs && tar -czvf fs.tar.gz *
-    mv .out/fs/fs.tar.gz .out/docker
-    cp Dockerfile .out/docker
-
-    sudo docker build .out/docker -t {{name}}-oxide-linux
-
-run-docker name="devel":
-    sudo docker run {{name}}-oxide-linux
-
-run-new-docker name="devel": (create-docker name) (run-docker name)
-
-# Bootable images
-create-bootable name="devel" size="1024": build-fs
+create-image name="devel" size="1024": build-fs
     @# Copy the things that GRUB needs
     cp deps/.out/linux.x86  .out/fs/boot/linux.x86
     cp defaults/grub.cfg    .out/fs/boot/grub/grub.cfg
@@ -106,10 +90,15 @@ create-bootable name="devel" size="1024": build-fs
 
     sudo losetup -d {{loop_device}}
 
-    mv .out/oxide.img .bootable-images/{{name}}.oxide.img
+    mv .out/oxide.img .images/{{name}}.oxide.img
 
-test-bootable image="devel":
+test image="devel":
     qemu-system-x86_64 -m 2g -bios /usr/share/ovmf/OVMF.fd \
-        -drive format=raw,file=.bootable-images/{{image}}.oxide.img
+        -drive format=raw,file=.images/{{image}}.oxide.img
 
-test-new-bootable name="devel" size="1024": (create-bootable name size) (test-bootable name)
+test-nogui image="devel":
+    qemu-system-x86_64 -curses -m 2g -bios /usr/share/ovmf/OVMF.fd \
+        -drive format=raw,file=.images/{{image}}.oxide.img
+
+test-new name="devel" size="1024": (create-image name size) (test name)
+test-nogui name="devel" size="1024": (create-image name size) (test-nogui name)
