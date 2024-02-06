@@ -54,7 +54,7 @@ create-docker name="devel": build-fs
     tar -czvf .out/docker/fs.tar.gz .out/fs
     cp Dockerfile .out/docker
 
-    docker build .out/docker
+    sudo docker build .out/docker
 
 
 # Bootable images
