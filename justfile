@@ -7,27 +7,32 @@ clean:
     -test -e .out && rm -r .out
     mkdir .out
 
-    -test -e .bootable-images || mkdir .bootable-images
-    -test -e .docker-images   || mkdir .docker-images
+purge: clean
+    just deps/purge
+    just modules/purge
 
 build-fs: clean
     @# Make all the dirs
-    test -d .out/fs || mkdir  .out/fs
+    mkdir  .out/fs
+    mkdir  .out/fs/.cargo
     mkdir  .out/fs/bin
     mkdir  .out/fs/boot
     mkdir  .out/fs/boot/grub
+    mkdir  .out/fs/dev
     mkdir  .out/fs/lib
     mkdir  .out/fs/lib/x86_64-linux-gnu
     mkdir  .out/fs/lib64
     mkdir  .out/fs/sbin
+    mkdir  .out/fs/system
 
     @# Copy the things that GRUB needs
     cp deps/.out/linux.x86  .out/fs/boot/linux.x86
-    cp grub.cfg             .out/fs/boot/grub/grub.cfg
+    cp defaults/grub.cfg    .out/fs/boot/grub/grub.cfg
 
     #@ Copy files that init links to
     cp /lib/x86_64-linux-gnu/libgcc_s.so.1  .out/fs/lib/x86_64-linux-gnu/libgcc_s.so.1
     cp /lib/x86_64-linux-gnu/libc.so.6      .out/fs/lib/x86_64-linux-gnu/libc.so.6
+    cp /lib/x86_64-linux-gnu/libm.so.6      .out/fs/lib/x86_64-linux-gnu/libm.so.6
     cp /lib64/ld-linux-x86-64.so.2          .out/fs/lib64/ld-linux-x86-64.so.2
 
     @# Compile all modules
@@ -38,7 +43,13 @@ build-fs: clean
     @# Make link to init
     ln .out/fs/sbin/quartz .out/fs/sbin/init
 
-create-bootable-image name="devel" size="1024": build-fs
+    @# Copy Cargo config
+    cp defaults/cargo_config.toml  .out/fs/.cargo/config.toml
+
+    @# Copy main services
+    cp defaults/system.rhai  .out/fs/system/main.rhai
+
+create-bootable name="devel" size="1024": build-fs
     test {{size}} -ge 128
     dd if=/dev/zero of=.out/oxide.img bs=1MiB count={{size}}
 
@@ -77,9 +88,10 @@ create-bootable-image name="devel" size="1024": build-fs
 
     sudo losetup -d {{loop_device}}
 
-    mv .out/oxide.img .images/{{name}}.oxide.img
+    mv .out/oxide.img .bootable-images/{{name}}.oxide.img
 
-test-bootable-image image="devel":
-    qemu-system-x86_64 -nographic -m 2g -bios /usr/share/ovmf/OVMF.fd -drive format=raw,file=.bootable-images/{{image}}.oxide.img
+test-bootable image="devel":
+    qemu-system-x86_64 -m 2g -bios /usr/share/ovmf/OVMF.fd \
+        -drive format=raw,file=.bootable-images/{{image}}.oxide.img
 
-test-new-bootable-image name="devel" size="1024": (create-bootable-image name size) (test-bootable-image name)
+test-new-bootable name="devel" size="1024": (create-bootable name size) (test-bootable name)
