@@ -51,7 +51,8 @@ create-docker name="devel": build-fs
     -test -e .out/docker && rm -r .out/docker
     mkdir .out/docker
 
-    tar -C .out/fs -czvf .out/docker/fs.tar.gz *
+    cd .out/fs && tar -czvf fs.tar.gz *
+    mv .out/fs/fs.tar.gz .out/docker
     cp Dockerfile .out/docker
 
     sudo docker build .out/docker -t {{name}}-oxide-linux
