@@ -7,11 +7,12 @@ clean:
     -test -e .out && rm -r .out
     mkdir .out
 
-    -test -e .images && mkdir .images
+    -test -e .bootable-images || mkdir .bootable-images
+    -test -e .docker-images   || mkdir .docker-images
 
-build: clean
+build-fs: clean
     @# Make all the dirs
-    mkdir  .out/fs
+    test -d .out/fs || mkdir  .out/fs
     mkdir  .out/fs/bin
     mkdir  .out/fs/boot
     mkdir  .out/fs/boot/grub
@@ -37,7 +38,7 @@ build: clean
     @# Make link to init
     ln .out/fs/sbin/quartz .out/fs/sbin/init
 
-create-image name="devel" size="1024": build
+create-bootable-image name="devel" size="1024": build-fs
     test {{size}} -ge 128
     dd if=/dev/zero of=.out/oxide.img bs=1MiB count={{size}}
 
@@ -78,7 +79,7 @@ create-image name="devel" size="1024": build
 
     mv .out/oxide.img .images/{{name}}.oxide.img
 
-test image="devel":
-    qemu-system-x86_64 -nographic -m 2g -bios /usr/share/ovmf/OVMF.fd -drive format=raw,file=.images/{{image}}.oxide.img
+test-bootable-image image="devel":
+    qemu-system-x86_64 -nographic -m 2g -bios /usr/share/ovmf/OVMF.fd -drive format=raw,file=.bootable-images/{{image}}.oxide.img
 
-test-new name="devel" size="1024": (create-image name size) (test name)
+test-new-bootable-image name="devel" size="1024": (create-bootable-image name size) (test-bootable-image name)
