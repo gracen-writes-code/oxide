@@ -92,13 +92,13 @@ create-image name="devel" size="1024": build-fs
 
     mv .out/oxide.img .images/{{name}}.oxide.img
 
-test image="devel":
-    qemu-system-x86_64 -m 2g -bios /usr/share/ovmf/OVMF.fd \
+test image="devel" mem="1G":
+    qemu-system-x86_64 -m {{mem}} -bios /usr/share/ovmf/OVMF.fd \
         -drive format=raw,file=.images/{{image}}.oxide.img
 
-test-nogui image="devel":
-    qemu-system-x86_64 -curses -m 2g -bios /usr/share/ovmf/OVMF.fd \
+test-nogui image="devel" mem="1G":
+    qemu-system-x86_64 -curses -m {{mem}} -bios /usr/share/ovmf/OVMF.fd \
         -drive format=raw,file=.images/{{image}}.oxide.img
 
-test-new name="devel" size="1024": (create-image name size) (test name)
-test-new-nogui name="devel" size="1024": (create-image name size) (test-nogui name)
+test-new name="devel" size="1024" mem="1G": (create-image name size) (test name mem)
+test-new-nogui name="devel" size="1024" mem="1G": (create-image name size) (test-nogui name mem)
