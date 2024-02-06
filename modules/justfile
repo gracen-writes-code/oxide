@@ -2,12 +2,11 @@ default:
     @just --list
 
 clean:
-    cargo clean
-
     -test -e .out && rm -r .out
     mkdir .out
 
 purge: clean
+    cargo clean
 
 build: clean
     mkdir .out/bin
