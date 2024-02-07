@@ -9,6 +9,8 @@ theme:
 nav:
   - Home: index.md
   - Compatibility: compat.md
+  - Quartz:
+      - Overview: quartz/overview.md
   - Filesystem Standard:
       - Overview: fs/overview.md
   - About:

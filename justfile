@@ -11,12 +11,11 @@ clean:
 
 purge: clean
     just deps/purge
-    just modules/purge
+    just binaries/purge
 
 build-fs: clean
     @# Make all the dirs
     mkdir  .out/fs
-    mkdir  .out/fs/.cargo
     mkdir  .out/fs/bin
     mkdir  .out/fs/boot
     mkdir  .out/fs/boot/grub
@@ -24,8 +23,8 @@ build-fs: clean
     mkdir  .out/fs/lib
     mkdir  .out/fs/lib/x86_64-linux-gnu
     mkdir  .out/fs/lib64
-    mkdir  .out/fs/sbin
     mkdir  .out/fs/system
+    mkdir  .out/fs/user
 
     #@ Copy files that init links to
     cp /lib/x86_64-linux-gnu/libgcc_s.so.1  .out/fs/lib/x86_64-linux-gnu/libgcc_s.so.1
@@ -33,19 +32,15 @@ build-fs: clean
     cp /lib/x86_64-linux-gnu/libm.so.6      .out/fs/lib/x86_64-linux-gnu/libm.so.6
     cp /lib64/ld-linux-x86-64.so.2          .out/fs/lib64/ld-linux-x86-64.so.2
 
-    @# Compile all modules
-    just modules/build
-    -cp modules/.out/bin/*   .out/fs/bin
-    -cp modules/.out/sbin/*  .out/fs/sbin
+    @# Generate and copy binaries
+    just binaries/build
+    -cp binaries/.out/bin/*   .out/fs/bin
 
     @# Make link to init
-    ln .out/fs/sbin/quartz .out/fs/sbin/init
-
-    @# Copy Cargo config
-    cp defaults/cargo_config.toml  .out/fs/.cargo/config.toml
+    ln .out/fs/bin/quartz .out/fs/bin/init
 
     @# Copy main services
-    cp defaults/system.rhai  .out/fs/system/main.rhai
+    cp defaults/system.rhai  .out/fs/system/unit.rhai
 
 create-image name="devel" size="1024": build-fs
     @# Copy the things that GRUB needs
