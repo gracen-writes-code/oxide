@@ -9,6 +9,9 @@ theme:
 nav:
   - Home: index.md
   - Compatibility: compat.md
+  - Getting Started:
+      - Installation: tutorial/install.md
+      - Setting Up: tutorial/setup.md
   - Quartz:
       - Overview: quartz/overview.md
       - System Unit: quartz/system_unit.md
