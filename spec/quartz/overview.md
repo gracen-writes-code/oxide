@@ -1,0 +1,3 @@
+# Quartz System Manager
+
+Like any multiprocessing Linux system, Oxide has a system manager. Because Oxide is a passion project, it won't settle to have a common system manager such as `systemd`, no! It must be *unique*; it must be *fun*! Hence, `quartz`, which is a system manager written from the ground up in Rust and designed with uniqueness and fun in mind. `quartz` shamelessly borrows the concept of a [unit](/en/latest/quartz/unit/) from `systemd`, allowing for a system hierarchy free to be as simple as a server running nginx or as complex as a multi-user desktop device. Whatever the need, `quartz` should theoretically be flexible enough to handle it.
