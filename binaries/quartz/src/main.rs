@@ -81,7 +81,7 @@ impl Quartz {
     }
 
     fn run_unit(&self, id: String) {
-        println!("We would normally run a unit named {id} here. We're testing, so we won't.")
+        // println!("We would normally run a unit named {id} here. We're testing, so we won't.")
     }
 }
 
