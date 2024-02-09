@@ -93,8 +93,8 @@ test image="devel" mem="1G":
 
 test-new name="devel" size="1024" mem="1G": (create-image name size) (test name mem)
 
-test-curses image="devel" mem="1G":
-    kvm -curses -m {{mem}} -bios /usr/share/ovmf/OVMF.fd \
+test-nographic image="devel" mem="1G":
+    kvm -nographic -m {{mem}} -bios /usr/share/ovmf/OVMF.fd \
         -drive format=raw,file=.images/{{image}}.oxide.img
 
-test-new-curses name="devel" size="1024" mem="1G": (create-image name size) (test-curses name mem)
+test-new-nographic name="devel" size="1024" mem="1G": (create-image name size) (test-curses name mem)
