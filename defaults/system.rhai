@@ -1,4 +1,1 @@
-new_service(
-    "foo",
-    "/bin/sh"
-)
+set_name("system")
