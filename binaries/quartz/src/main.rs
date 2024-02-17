@@ -1,5 +1,5 @@
 use std::{
-    fmt,
+    fmt, fs, io,
     os::fd::RawFd,
     path::PathBuf,
     process::{self, Command},
@@ -7,20 +7,26 @@ use std::{
 
 use nix::{errno::Errno, fcntl, sys::stat::Mode};
 
+use serde::Deserialize;
+use serde_yaml as yaml;
+
 enum QuartzError {
-    KmsgOpen(Errno),
+    OpenKmsg(Errno),
 }
 
-enum UnitError {}
+enum UnitError {
+    ReadConfig(io::Error),
+    ParseConfig(yaml::Error),
+    Config(UnitConfigError),
+}
 
-impl fmt::Debug for QuartzError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            QuartzError::KmsgOpen(e) => {
-                write!(f, "couldn't open /dev/kmsg: {e:?}")
-            }
-        }
-    }
+enum UnitConfigError {
+    NotAMapping,
+}
+
+#[derive(Deserialize)]
+struct UnitConfig {
+    dependencies: Vec<String>
 }
 
 #[derive(Default)]
@@ -31,7 +37,7 @@ struct Quartz {
 impl Quartz {
     fn new() -> Result<Self, QuartzError> {
         let kmsg = fcntl::open("/dev/kmsg", fcntl::OFlag::O_RDWR, Mode::empty())
-            .map_err(|e| QuartzError::KmsgOpen(e))?;
+            .map_err(|e| QuartzError::OpenKmsg(e))?;
 
         Ok(Self {
             kmsg,
@@ -39,8 +45,15 @@ impl Quartz {
         })
     }
 
-    fn run_unit(&self, id: PathBuf) -> Result<(), UnitError> {
-        println!("We would normally run a unit named {id:?} here. We're testing, so we won't.");
+    fn run_unit(&self, name: PathBuf) -> Result<(), UnitError> {
+        let cfg: UnitConfig = yaml::from_str(
+            &fs::read_to_string(name.join("unit.yml")).map_err(|e| UnitError::ReadConfig(e))?,
+        )
+        .map_err(|e| UnitError::ParseConfig(e))?;
+
+        for dep in cfg.dependencies {
+            println!("This unit depends on {}", dep);
+        }
 
         Ok(())
     }
@@ -48,10 +61,15 @@ impl Quartz {
 
 fn main() -> ! {
     if process::id() != 1 {
-        panic!("quartz can only be run as the init process")
+        panic!("Quartz can only be run as the init process")
     }
 
-    let inst = Quartz::new().expect("failed to initialize quartz");
+    let inst = match Quartz::new() {
+        Ok(inst) => inst,
+        Err(err) => match err {
+            _ => panic!("Failed to initialize Quartz!"),
+        },
+    };
 
     loop {
         match inst.run_unit("/system".into()).err() {
@@ -59,7 +77,7 @@ fn main() -> ! {
                 _ => println!("An unexpected error occurred!"),
             },
             None => {
-                println!("The init unit exited! This shouldn't happen normally, but does not necessarily indicate an error.");
+                println!("The system unit exited! This shouldn't happen normally, but does not necessarily indicate an error.");
             }
         }
 
