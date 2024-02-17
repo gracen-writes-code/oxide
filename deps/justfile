@@ -7,7 +7,7 @@ clean:
 
 purge: clean
 
-build: clean build-grub build-linux
+build: clean build-grub build-linux build-rust
 
 GRUB_VERSION := "2.06"
 
@@ -27,3 +27,22 @@ build-linux:
     cd .out/{{LINUX_VERSION}} && make defconfig && make all
 
     cp .out/{{LINUX_VERSION}}/arch/x86/boot/bzImage .out/linux.x86
+
+RUST_DATE := "2024-02-08"
+RUST_VERSION := "1.76.0"
+TARGET_TRIPLE := "x86_64-unknown-linux-gnu"
+
+build-rust:
+    -test -e .out/rust-sysroot && rm -r .out/rust-sysroot
+    mkdir .out/rust-sysroot
+
+    curl https://static.rust-lang.org/dist/{{RUST_DATE}}/rustc-{{RUST_VERSION}}-{{TARGET_TRIPLE}}.tar.xz -o .out/rustc.tar.xz
+    curl https://static.rust-lang.org/dist/{{RUST_DATE}}/rust-std-{{RUST_VERSION}}-{{TARGET_TRIPLE}}.tar.xz -o .out/rust-std.tar.xz
+
+    cd .out && tar xf rustc.tar.xz
+    cd .out && tar xf rust-std.tar.xz
+
+    cp -r .out/rustc-{{RUST_VERSION}}-{{TARGET_TRIPLE}}/rustc/* .out/rust-sysroot
+    cp -r .out/rust-std-{{RUST_VERSION}}-{{TARGET_TRIPLE}}/rust-std-{{TARGET_TRIPLE}}/* .out/rust-sysroot
+
+    rm .out/rust-sysroot/manifest.in

@@ -13,6 +13,8 @@ purge: clean
     just deps/purge
     just binaries/purge
 
+    -rm .images/devel.oxide.img
+
 build-fs: clean
     @# Make all the dirs
     mkdir  .out/fs
@@ -23,8 +25,6 @@ build-fs: clean
     mkdir  .out/fs/lib
     mkdir  .out/fs/lib/x86_64-linux-gnu
     mkdir  .out/fs/lib64
-    mkdir  .out/fs/system
-    mkdir  .out/fs/user
 
     #@ Copy files that init links to
     cp /lib/x86_64-linux-gnu/libgcc_s.so.1  .out/fs/lib/x86_64-linux-gnu/libgcc_s.so.1
@@ -34,13 +34,13 @@ build-fs: clean
 
     @# Generate and copy binaries
     just binaries/build
-    -cp binaries/.out/bin/*   .out/fs/bin
+    -cp binaries/.out/bin/* .out/fs/bin
 
     @# Make link to init
     ln .out/fs/bin/quartz .out/fs/bin/init
 
-    @# Copy main services
-    cp defaults/system.rhai  .out/fs/system/unit.rhai
+    @# Copy rust sysroot
+    cp -r deps/.out/rust-sysroot/* .out/fs
 
 create-image name="devel" size="1024": build-fs
     @# Copy the things that GRUB needs
@@ -93,8 +93,8 @@ test image="devel" mem="1G":
 
 test-new name="devel" size="1024" mem="1G": (create-image name size) (test name mem)
 
-test-nographic image="devel" mem="1G":
+test-ng image="devel" mem="1G":
     kvm -nographic -m {{mem}} -bios /usr/share/ovmf/OVMF.fd \
         -drive format=raw,file=.images/{{image}}.oxide.img
 
-test-new-nographic name="devel" size="1024" mem="1G": (create-image name size) (test-nographic name mem)
+test-new-ng name="devel" size="1024" mem="1G": (create-image name size) (test-ng name mem)
