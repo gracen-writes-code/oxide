@@ -17,11 +17,6 @@ enum QuartzError {
 enum UnitError {
     ReadConfig(io::Error),
     ParseConfig(yaml::Error),
-    Config(UnitConfigError),
-}
-
-enum UnitConfigError {
-    NotAMapping,
 }
 
 #[derive(Deserialize)]
@@ -71,10 +66,12 @@ fn main() -> ! {
         },
     };
 
+    println!("Successfully initialized Quartz. Welcome to Oxide Linux!");
+
     loop {
         match inst.run_unit("/system".into()).err() {
             Some(err) => match err {
-                _ => println!("An unexpected error occurred!"),
+                _ => println!("An unexpected error occurred while loading the system unit!"),
             },
             None => {
                 println!("The system unit exited! This shouldn't happen normally, but does not necessarily indicate an error.");

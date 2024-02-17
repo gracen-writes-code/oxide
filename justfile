@@ -11,7 +11,7 @@ clean:
 
 purge: clean
     just deps/purge
-    just binaries/purge
+    just utils/purge
 
     -rm .images/devel.oxide.img
 
@@ -33,8 +33,8 @@ build-fs: clean
     cp /lib64/ld-linux-x86-64.so.2          .out/fs/lib64/ld-linux-x86-64.so.2
 
     @# Generate and copy binaries
-    just binaries/build
-    -cp binaries/.out/bin/* .out/fs/bin
+    just utils/build
+    -cp utils/.out/bin/* .out/fs/bin
 
     @# Make link to init
     ln .out/fs/bin/quartz .out/fs/bin/init
